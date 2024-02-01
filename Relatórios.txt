@@ -1,3 +1,4 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExercicioII_GroupBy
 Asafe Belo Borges
 Laboratório de Banco de Dados
 
