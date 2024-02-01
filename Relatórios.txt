@@ -1,0 +1,21 @@
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+Quantidade total de vendas por cliente, aparecendo nome e total descrescente
+
+select c.nome as nomeCliente,
+sum(v.total) as totalCliente
+from venda v
+inner join cliente c on c.id = v.clienteID
+group by nome
+order by totalCliente desc
+
+Quantidade total de cada produto por cliente
+
+select c.nome as nomeCliente, 
+p.nome as nomeProduto,
+sum(vp.quantidade) as quantidadeTotal
+from (((vendaProduto vp
+inner join venda v on v.id = vp.vendaId) inner join produto p on vp.produtoID = p.id)
+inner join cliente c on c.id = v.clienteID)
+group by nomeCliente, nomeProduto
