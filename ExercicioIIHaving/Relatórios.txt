@@ -1,3 +1,4 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
 Asafe Belo Borges
 Laboratório de Banco de Dados
 
