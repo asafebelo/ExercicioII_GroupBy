@@ -1,0 +1,36 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Precisamos saber quais sãoo os códigos e os nomes dos produtos e a quantidade que tiveram pelo menos 10 vendas, ou que tiveram somente
+1 venda
+
+(select p.id_produto as idprod, p.nome as produto, sum(v.quantidade)
+	from produto p
+	inner join venda v on p.id_produto = codigoProduto
+	group by idprod, produto
+	having sum(v.quantidade) >= 10)
+union
+(select p.id_produto as idprod, p.nome as produto, sum(v.quantidade)
+	from produto p
+	inner join venda v on p.id_produto = codigoProduto
+	group by idprod, produto
+	having sum(v.quantidade) = 1)
+
+// Recupere as informações do cliente que mais gastou na loja, juntamente com o cliente que menos gastou na loja
+
+(select c.nome, v.codigoCliente, sum(p.preco) as maiorGasto
+	from produto p
+	inner join venda v on p.id_produto = v.codigoProduto
+	inner join cliente c on c.id_cliente = v.codigoCliente
+	group by v.codigoCliente, c.nome
+	order by maiorGasto desc
+	limit 1)
+union
+(select c.nome, v.codigoCliente, sum(p.preco) as maiorGasto
+	from produto p
+	inner join venda v on p.id_produto = v.codigoProduto
+	inner join cliente c on c.id_cliente = v.codigoCliente
+	group by v.codigoCliente, c.nome
+	order by maiorGasto asc
+	limit 1)
