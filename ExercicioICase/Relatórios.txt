@@ -1,0 +1,32 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Recuperar todos os nomes de todos os estados de todos os países, mostrando o nome do país e o nome do estado, contudo quando for o Brasil o relatório deverá mostrar somente a sigla do país e a sigla do estado.
+
+select
+	case 
+		when p.nome = 'Brasil' then p.sigla
+		else p.nome
+	end as nomepais,
+	case
+		when p.nome = 'Brasil' then e.sigla
+		else e.nome
+	end as nomeestado
+from estado e
+inner join pais p on e.codigoPais = p.id_pais;
+
+// Recuperar todos os nomes de todos as cidades, mostrando o nome da cidade e o nome do estado, contudo quando não for o Brasil, o relatório deverá mostrar somente o nome da cidade e a sigla do país
+
+select
+	case 
+		when p.nome != 'Brasil' then c.nome
+		else p.nome
+	end as nomecidade,
+	case
+		when p.nome != 'Brasil' then p.sigla
+		else e.nome
+	end as nomeestado
+from estado e
+inner join cidade c on c.codigoEstado = e.id_estado
+inner join pais p on e.codigoPais = p.id_pais;

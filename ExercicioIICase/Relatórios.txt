@@ -1,0 +1,18 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Crie um conjunto de rela¸c˜oes Categoria Carteira de Motorista x Aluno:
+Faazer a consulta para saber quais são os alunos e suas respectivas carteiras que estão almejando, retornando o nome do cliente, e a categoria ao qual ele deseja, sendo que no banco só existem as categorias A, B, C, D ou E, e o relatório deverá retornar Moto, Carro, Caminhão, Ônibus e Eixo, para as respectivas categorias.
+
+select a.nome,
+	case 
+		when cm.tipocarteira = 'A' then 'Moto'
+		when cm.tipocarteira = 'B' then 'Carro'
+		when cm.tipocarteira = 'C' then 'Caminhão'
+		when cm.tipocarteira = 'D' then 'Ônibus'
+		when cm.tipocarteira = 'E' then 'Eixo'
+		else 'other'
+	end as tipoCarteira
+from aluno a
+inner join carteiraMotorista cm on a.codigoCarteira = cm.id_carteira
