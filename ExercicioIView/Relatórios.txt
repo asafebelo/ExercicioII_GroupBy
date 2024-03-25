@@ -1,0 +1,37 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Mostre o nome do fabricante e a bebidas que ele vende
+
+create view nomes_fabricantes_bebidas as
+	select f.nome as fabricantes, b.descricao as bebidas
+	from fabricante f
+	inner join bebida b on f.id_fabricante = b.codigoFabricante
+
+select *
+from nomes_fabricantes_bebidas
+
+// Mostre o nome do fabricante, o nome da cidade e o nome da bebida
+que fabrica
+
+create view nomes_fabricantes_cidades_bebidas as
+	select f.nome as fabricantes, c.nome as cidades, b.descricao as bebidas
+	from fabricante f
+	inner join bebida b on f.id_fabricante = b.codigoFabricante
+	inner join cidade c on c.id_cidade = f.codigoCidade
+
+select *
+from nomes_fabricantes_cidades_bebidas
+
+// Mostre os nomes das bebidas e o nome dos produtos em uma ´unica
+consulta
+
+create view nomes_bebidas_produtos as
+	select b.descricao as bebidas, p.descricao as produtos
+	from fabricante f
+	inner join bebida b on f.id_fabricante = b.codigoFabricante
+	inner join produto p on f.id_fabricante = p.codigoFabricante
+
+select * 
+from nomes_bebidas_produtos

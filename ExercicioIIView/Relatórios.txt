@@ -1,0 +1,41 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Mostre o nome dos alunos, disciplinas e dos professores
+
+create view nomes_alunos_disciplinas_professores as 
+	select a.nome as alunos, d.nome as disciplinas, p.nome as professores
+	from aluno a
+	inner join matricula m on a.id_aluno = m.codigoAluno
+	inner join turma t on t.id_turma = m.codigoTurma
+	inner join disciplina d on d.id_disciplina = t.codigoDisciplina
+	inner join professor p on p.id_professor = t.codigoProfessor
+
+select *
+from nomes_alunos_disciplinas_professores
+
+// Mostre o nome das turmas, das disciplinas e dos professores
+
+create view nomes_turmas_disciplinas_professores as 
+	select t.nome as turmas, d.nome as disciplinas, p.nome as professores
+	from turma t
+	inner join disciplina d on t.codigoDisciplina = d.id_disciplina
+	inner join professor p on t.codigoProfessor = p.id_professor
+
+select * 
+from nomes_turmas_disciplinas_professores
+
+// Mostre o nome das turmas, dos professores e quantos alunos tem por
+turma
+
+create view nomes_turmas_professor_qntAlunos as
+	select t.nome as turmas, p.nome as professores, count(a.id_aluno) as qntAlunos
+	from turma t
+	inner join professor p on t.codigoProfessor = p.id_professor
+	inner join matricula m on t.id_turma = m.codigoTurma
+	inner join aluno a on m.codigoAluno = a.id_aluno
+	group by t.nome, p.nome
+
+select * 
+from nomes_turmas_professor_qntAlunos
