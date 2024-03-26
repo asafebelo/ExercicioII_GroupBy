@@ -1,0 +1,111 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Os livros que custarem mais de 10 reais, devem ver o seu preço diminuído em 10%. Os restantes devem sofrer um aumento de 15%
+
+insert into livro (titulo, editora, preco) values
+('Dom Quixote', 'O Bom Brasil', 6.00),
+('Capitães de Areia', 'Sempre Revivendo', 26.00),
+('Alice no País das Maravilhas', 'O Bom Brasil', 12.00),
+('Gravity Falls Nº 3', 'Disney', 4.00);
+
+do $$
+declare 
+	cursor_precos_livros cursor for 
+		select id_livro, preco from livro;
+
+	id_cursor_livro int;
+	preco_cursor real;
+begin
+	open cursor_precos_livros;
+
+	loop
+		fetch cursor_precos_livros into id_cursor_livro, preco_cursor;
+	
+		exit when not found;
+	
+		if preco_cursor > 10 then
+			update livro set preco = preco_cursor - (0.1*preco_cursor) where id_livro = id_cursor_livro;
+		else
+			update livro set preco = preco_cursor + (0.15*preco_cursor) where id_livro = id_cursor_livro;
+		end if;
+	end loop;
+
+	close cursor_precos_livros;
+end $$;
+
+// Crie um cursor para uma tabela Autor. Leia desse cursor o primeiro e
+o último nome do autor, bem como o estado de onde é originário. Para os autores originários da ”California”, imprima os nomes (primeiro e ultimo) do autor juntamente com o texto” (mora na California)”. Caso contrário, basta imprimir o primeiro e ultimo nome do autor
+
+insert into autor (nome, estadoNatal) values
+('Asafe Belo Borges', 'Cuiabá'),
+('Leonardo Wilhelm DiCaprio', 'Califórnia'),
+('Oprah Gail Winfrey', 'Mississípi'),
+('Zé Bonitinho', 'São Paulo');
+
+do $$
+declare
+	cursor_autor cursor for 
+		select concat(substring(nome from 1 for position(' ' in nome) - 1), /* aqui eu estou pegando só o primeiro e o último nome, concatenando as duas substrings */
+			   ' ', reverse(substring(reverse(nome) from 1 for position(' ' in reverse(nome)) - 1)))
+			   as nome_primeiro_ultimo, estadoNatal from autor;
+	
+	nome_cursor varchar;
+	estadoNatal_cursor varchar;
+	imprimir varchar;
+begin
+	open cursor_autor;
+	
+	loop
+		fetch cursor_autor into nome_cursor, estadoNatal_cursor;
+		exit when not found;
+		
+		if estadoNatal_cursor = 'Califórnia' then
+			imprimir := nome_cursor || ' mora na Califórnia';
+		else
+			imprimir := nome_cursor;
+		end if;
+		raise notice '%', imprimir;
+	end loop;
+end $$
+
+// Crie um procedimento que inscreva aluno em disciplinas. Caso o aluno não exista, o sistema deve escrever um aviso e criar um novo aluno, antes de efetuar a inserção. Caso a disciplina não exista, o sistema deve escrever um aviso e criar uma nova disciplina, antes de efetuar a inserção. Caso a disciplina já tenha o aluno inscrito, o sistema deve escrever apenas: ignorado: O aluno nome aluno já está inscrito em nome disciplina.
+
+create or replace procedure inscricao_aluno_disciplina (nome_aluno varchar, nome_disciplina varchar)
+language plpgsql
+as $$
+declare
+	alunoId int;
+	disciplinaId int;
+begin
+	select id_aluno into alunoId
+	from aluno
+	where nome = nome_aluno;
+	
+	if alunoId is NULL then
+		raise notice 'O aluno % não existe. Estamos criando um novo aluno', nome_aluno;
+		insert into aluno(nome) values (nome_aluno) returning id_aluno into alunoId;
+	end if;
+	
+	select id_disciplina into disciplinaId
+	from disciplina
+	where nome = nome_disciplina;
+	
+	if disciplinaId is NULL then
+		raise notice 'A disciplina % não existe. Estamos criando uma nova disciplina', nome_disciplina;
+		insert into disciplina(nome) values (nome_disciplina) returning id_disciplina into disciplinaId;
+	end if;
+	
+	if exists (
+		select * from matricula
+		where codigoAluno = alunoId and codigoDisciplina = disciplinaId
+	) then
+		raise notice 'O aluno % já está inscrito na disciplina %', nome_aluno, nome_disciplina;
+	else
+		insert into matricula (codigoAluno, codigoDisciplina) values (alunoId, disciplinaId);
+		raise notice 'aluno % inscrito na disciplina %', nome_aluno, nome_disciplina;
+	end if;
+end $$;
+
+call inscricao_aluno_disciplina('Asafe', 'Português');
