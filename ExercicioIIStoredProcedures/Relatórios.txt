@@ -1,0 +1,30 @@
+Tabelas SQL em Github: https://github.com/asafebelo/ExerciciosLabBD
+Asafe Belo Borges
+Laboratório de Banco de Dados
+
+// Crie uma função que receba o nome do aluno e retorne a média das suas notas utilizando alguma estrutura de loop.
+
+create or replace function media_notas_aluno(nomeAluno varchar)
+returns float as $$
+declare
+	somaNotas float := 0.0;
+	i int = 0;
+	media float;
+	notaAtual float;
+begin
+	media := 0;
+	
+	for notaAtual in select nota from nota where aluno = nomeAluno loop
+		somaNotas := somaNotas + notaAtual;
+		i := i+1;
+	end loop;
+	
+	if(i > 0) then
+		media = somaNotas / i;
+	end if;
+	
+	return media;
+end;
+$$ language plpgsql;
+
+select media_notas_aluno('Asafe');
