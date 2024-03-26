@@ -200,3 +200,135 @@
 
 `select *` \
 `from nomes_turmas_professor_qntAlunos` 
+
+### Exercício I Stored Procedures
+1. Crie uma função que dado um número calcule seu fatorial.
+
+`create or replace function fazendo_fatorial(numero int)` \
+`returns int as $$` \
+`declare` \
+	`i int := 1;` \
+	`calculandoFatorial int := 1;` \
+`begin` \
+	`if numero < 0 then` \
+        `raise exception 'Não é possível calcular fatorial de números negativos';` \
+    `end if;` \
+	`while numero >= i loop` \
+	`calculandoFatorial := calculandoFatorial * i;` \
+	`i := i + 1;` \
+	`end loop;` \
+	`return calculandoFatorial;` \
+`end;` \
+`$$ language plpgsql;` \
+
+`select fazendo_fatorial(5);`
+
+2. Dados quatro números distintos, desenvolva uma função que determine e retorne a soma dos três menores.
+
+`create or replace function soma_tres_menores(n1 real, n2 real, n3 real, n4 real)` \
+`returns real as $$` \
+`declare` \
+    `menor1 real;` \
+	`menor2 real;` \
+	`menor3 real;` \
+`begin` \
+    `menor1 := n1;` \
+	`menor2 := n2;` \
+	`menor3 := n3;` \                                         
+	`if menor2 < menor1 then` \
+		`menor1 := n2;` \
+		`menor2 := n1;` \
+	`end if;` \
+	`if menor3 < menor1 then` \                          
+		`menor2 := menor1;` \
+		`menor1 := n3;` \
+	`elsif menor3 < menor2 then` \                        
+		`menor2 := n3;` \
+	`end if;` \
+	`if n4 < menor1 then` \
+		`menor3 := menor2;` \
+		`menor2 := menor1;` \
+		`menor1 := n4;` \
+	`elsif n4 < menor2 then` \
+		`menor3 := menor2;` \
+		`menor2 := n4;` \
+	`elsif n4 < menor3 then` \
+		`menor3 := n4;` \
+	`end if;` \
+	`return menor1 + menor2 + menor3;` \
+`end;` \
+`$$ language plpgsql;` \
+
+`select soma_tres_menores(10, 8, 6, 4);` \
+
+
+3. Faça uma função que dado um número de 4 dígitos calcule e retorne se ele possui ou não esta característica.
+
+`create or replace function caracteristica_numero(numero varchar)` \
+`returns varchar as $$` \
+`declare` \
+	`num1 int;` \
+	`num2 int;` \
+	`somaNum int;` \
+	`potNum int;` \
+	`temCaracteristica varchar;` \
+`begin` \
+	`num1 := cast(substring(numero from 1 for 2 )as int);` \
+	`num2 := cast(substring(numero from 3 for 2) as int);` \
+	`somaNum = num1 + num2;` \
+	`potNum = somaNum * somaNum;` \
+	`if potNum = cast(numero as int) then` \
+		`temCaracteristica := 'Tem caracteristica';` \
+	`else` \
+		`temCaracteristica := 'Não tem a característica';` \
+	`end if;` \
+	`return temCaracteristica;` \ 
+`end;` \
+`$$ language plpgsql;` \
+
+select caracteristica_numero('3030');`
+
+4. Escreva uma função que receba um valor N inteiro e positivo, e que calcula o valor de E. `E = 1 + 1/1! + 1/2! + 1/3! ... + 1/N!`
+
+`create or replace function valor_de_E(N int)` \
+`returns float as $$` \
+`declare` \
+	`i int := 1;` \
+	`fat int := 1;` \
+	`somaNum float := 1;` \
+`begin` \
+	`while i <= N loop` \
+		`somaNum = (somaNum + (1.0/fat));` \
+		`i := i + 1;` \
+		`fat := fat * i;` \
+	`end loop;` \
+	`return somaNum;` \
+`end;` \
+`$$ language plpgsql;`
+
+`select valor_de_E(5);`
+
+### Exercício II Stored Procedures
+1. Crie uma função que receba o nome do aluno e retorne a média das suas notas utilizando alguma estrutura de loop.
+
+`create or replace function media_notas_aluno(nomeAluno varchar)` \
+`returns float as $$` \
+`declare` \
+	`somaNotas float := 0.0;` \
+	`i int = 0;` \
+	`media float;` \
+	`notaAtual float;` \
+`begin` \
+	`media := 0;`
+	`for notaAtual in select nota from nota where aluno = nomeAluno loop` \
+		`somaNotas := somaNotas + notaAtual;` \
+		`i := i+1;` \
+	`end loop;` \
+	`if(i > 0) then` \
+		`media = somaNotas / i;` \
+	`end if;`
+	`return media;` \
+`end;` \
+`$$ language plpgsql;`
+
+`select media_notas_aluno('Asafe');`
